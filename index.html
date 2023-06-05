@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Реєстрація</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Реєстрація</h1>
+        <div id="success"></div>
+        <div id="error" style="background-color: red;"></div>
+        <form id="registrationForm">
+            <div class="form-group">
+                <label for="name">Ім'я:</label>
+                <input type="text" class="form-control" id="name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="surname">Прізвище:</label>
+                <input type="text" class="form-control" id="surname" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" class="form-control" id="email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Пароль:</label>
+                <input type="password" class="form-control" id="password" required>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Повторіть пароль:</label>
+                <input type="password" class="form-control" id="confirmPassword" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Зареєструватись</button>
+        </form>
+    </div>
+
+
+
+<script>
+    $(document).ready(function() {
+        $('#registrationForm').submit(function(e) {
+            e.preventDefault();
+    
+            var name = $('#name').val();
+            var surname = $('#surname').val();
+            var email = $('#email').val();
+            var password = $('#password').val();
+            var confirmPassword = $('#confirmPassword').val();
+    
+            if (!validateEmail(email)) {
+                $('#error').text('Введіть правильний email');
+                return;
+            }
+    
+            if (password !== confirmPassword) {
+                $('#error').text('Паролі не співпадають');
+                return;
+            }
+    
+            $.ajax({
+                url: 'registration.php',
+                type: 'POST',
+                data: {
+                    name: name,
+                    surname: surname,
+                    email: email,
+                    password: password,
+                    confirmPassword: confirmPassword
+                },
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success) {
+                        $('#registrationForm').hide();
+                        $('#success').text(response.message);
+                        $('#error').text('');
+                    } else if (response.error) {
+                        $('#error').text(response.error.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $('#error').text(error);
+                    console.log(error);
+                }
+            });
+        });
+    
+        // Функція валідації email
+        function validateEmail(email) {
+            var re = /\S+@\S+\.\S+/;
+            return re.test(email);
+        }
+    });    
+</script>
+</body>
+</html>
